@@ -1,12 +1,14 @@
 const LEETCODE_API_URL = 'https://leetcode.com/graphql';
 const LEETCODE_USER = 'nikuz';
 const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36';
-const SYNC_URL = 'https://ruby-cheerful-spider.cyclic.app/sync-total-solved';
+const API_URL = 'https://ruby-cheerful-spider.cyclic.app';
 
 const buttonEl = document.getElementById('sync-btn');
 const loadingEl = document.getElementById('loading');
 const successEl = document.getElementById('success');
 const errorEl = document.getElementById('error');
+const storageKey = 'leetcode-counter';
+let counter = 0;
 
 buttonEl.onclick = async function () {
     const cookieStores = await chrome.cookies.getAllCookieStores();
@@ -50,16 +52,12 @@ buttonEl.onclick = async function () {
                 }
             `,
             }),
-        }).then(async response => {
-            const text = await response.text();
-            console.log(text);
-            return JSON.parse(text);
-        }).then(({ data }) => {
+        }).then(response => response.json()).then(({ data }) => {
             const allSubmissions = data.matchedUser.submitStats.acSubmissionNum.find(item => (
                 item.difficulty === 'All'
             ));
             if (allSubmissions) {
-                fetch(SYNC_URL, {
+                fetch(`${API_URL}/sync-total-solved`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -85,7 +83,9 @@ function showLoading() {
     loadingEl.style.display = 'block';
 }
 
-function showSuccess(counter) {
+function showSuccess(value) {
+    counter = value
+    localStorage.setItem(storageKey, value.toString());
     loadingEl.style.display = 'none';
     errorEl.style.display = 'none';
     successEl.innerText = counter;
@@ -98,3 +98,18 @@ function showError(error) {
     errorEl.innerText = error.message;
     errorEl.style.display = 'block';
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    counter = Number(localStorage.getItem(storageKey)) || 0;
+    if (counter === 0) {
+        showLoading();
+        fetch(`${API_URL}/total-solved`).then(async (response) => {
+            const value = await response.text();
+            if (value) {
+                showSuccess(Number(value));
+            }
+        }).catch(showError);
+    } else {
+        showSuccess(counter);
+    }
+});
