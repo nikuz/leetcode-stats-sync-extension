@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="popup.js" type="module"></script>
+    <style>
+        #logo {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 10px;
+            border-radius: 100%;
+            background-color: #000;
+            text-align: center;
+        }
+        #sync-btn {
+            white-space: nowrap;
+            min-width: 150px;
+            min-height: 40px;
+        }
+        #success {
+            display: none;
+            margin: 10px auto;
+            color: green;
+            font-size: 30px;
+            text-align: center;
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #loading {
+            display: none;
+            margin: 10px auto;
+            border: 5px solid #EAF0F6;
+            border-top: 5px solid #FF7A59;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spinner 1s linear infinite;
+        }
+        #error {
+            display: none;
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id='logo'>
+    <img src="images/icon-48.png" alt="" />
+</div>
+<button id="sync-btn">Sync</button>
+<div id="success"></div>
+<div id="loading"></div>
+<div id="error"></div>
+</body>
+</html>
